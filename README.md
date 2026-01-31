@@ -3,6 +3,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EBO Medikal - Servis Formu</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 * {
 margin: 0;
@@ -31,26 +32,41 @@ overflow: hidden;
 background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 padding: 20px;
 text-align: center;
-position: relative;
 }
 
 .logo {
-width: 140px;
+max-width: 180px;
 height: auto;
-margin-bottom: 15px;
-filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+margin-bottom: 10px;
 }
 
 .header h1 {
 color: #ffd700;
-font-size: 1.4em;
+font-size: 1.3em;
 font-weight: 700;
-margin-bottom: 5px;
 }
 
-.header p {
-color: #a0a0a0;
-font-size: 0.85em;
+.qr-section {
+background: white;
+padding: 15px;
+text-align: center;
+border-bottom: 2px solid #e1e4e8;
+}
+
+.qr-container {
+display: inline-block;
+padding: 10px;
+background: white;
+border-radius: 10px;
+border: 2px solid #ffd700;
+}
+
+.qr-id {
+margin-top: 8px;
+font-family: monospace;
+font-size: 0.9em;
+color: #666;
+font-weight: 600;
 }
 
 .form-container {
@@ -58,35 +74,27 @@ padding: 20px;
 }
 
 .section {
-margin-bottom: 25px;
-padding: 20px;
+margin-bottom: 20px;
+padding: 15px;
 background: #fafbfc;
 border-radius: 12px;
 border-left: 4px solid #ffd700;
 }
 
 .section-title {
-font-size: 1em;
+font-size: 0.95em;
 color: #1a1a2e;
 font-weight: 600;
-margin-bottom: 15px;
+margin-bottom: 12px;
 display: flex;
 align-items: center;
 gap: 8px;
 }
 
-.section-title::before {
-content: '';
-width: 6px;
-height: 6px;
-background: #ffd700;
-border-radius: 50%;
-}
-
 .form-row {
 display: flex;
 flex-direction: column;
-gap: 12px;
+gap: 10px;
 }
 
 .form-group {
@@ -97,29 +105,26 @@ flex-direction: column;
 label {
 font-weight: 500;
 color: #444;
-margin-bottom: 6px;
+margin-bottom: 5px;
 font-size: 0.85em;
 }
 
 input, select, textarea {
-padding: 12px 14px;
+padding: 10px 12px;
 border: 1.5px solid #e1e4e8;
-border-radius: 10px;
-font-size: 16px; /* iOS zoom önleme */
-transition: all 0.2s;
-background: white;
+border-radius: 8px;
+font-size: 16px;
 width: 100%;
 }
 
 input:focus, select:focus, textarea:focus {
 outline: none;
 border-color: #ffd700;
-box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
 }
 
 textarea {
 resize: vertical;
-min-height: 80px;
+min-height: 60px;
 }
 
 .checkbox-grid {
@@ -131,90 +136,59 @@ gap: 8px;
 .checkbox-item {
 display: flex;
 align-items: center;
-gap: 8px;
-padding: 10px;
+gap: 6px;
+padding: 8px;
 background: white;
-border-radius: 8px;
-border: 1.5px solid #e1e4e8;
+border-radius: 6px;
+border: 1px solid #e1e4e8;
 font-size: 0.85em;
-cursor: pointer;
-}
-
-.checkbox-item:active {
-transform: scale(0.98);
-}
-
-input[type="checkbox"] {
-width: 18px;
-height: 18px;
-accent-color: #ffd700;
 }
 
 .priority-selector {
 display: grid;
 grid-template-columns: repeat(3, 1fr);
-gap: 10px;
+gap: 8px;
 }
 
 .priority-btn {
-padding: 12px;
+padding: 10px;
 border: 2px solid #e1e4e8;
 background: white;
-border-radius: 10px;
+border-radius: 8px;
 cursor: pointer;
-transition: all 0.2s;
 font-weight: 500;
-font-size: 0.9em;
+font-size: 0.85em;
 }
-
-.priority-btn.low { color: #28a745; }
-.priority-btn.medium { color: #ff9800; }
-.priority-btn.high { color: #dc3545; }
 
 .priority-btn.active {
-transform: scale(1.05);
-font-weight: 600;
+background: #ffd700;
+border-color: #ffd700;
+color: #1a1a2e;
 }
-
-.priority-btn.low.active { background: #d4edda; border-color: #28a745; }
-.priority-btn.medium.active { background: #fff3cd; border-color: #ff9800; }
-.priority-btn.high.active { background: #f8d7da; border-color: #dc3545; }
 
 .parts-card {
 background: white;
-border-radius: 10px;
+border-radius: 8px;
 border: 1.5px solid #e1e4e8;
-padding: 15px;
-margin-bottom: 10px;
+padding: 12px;
+margin-bottom: 8px;
 }
 
 .parts-row {
 display: grid;
 grid-template-columns: 1fr 1fr;
-gap: 10px;
-margin-bottom: 10px;
-}
-
-.parts-row input {
-padding: 10px;
-font-size: 0.9em;
-}
-
-.parts-actions {
-display: flex;
 gap: 8px;
-margin-top: 10px;
+margin-bottom: 8px;
 }
 
 .btn-icon {
-flex: 1;
-padding: 10px;
+padding: 8px;
 border: none;
-border-radius: 8px;
+border-radius: 6px;
 cursor: pointer;
-font-size: 0.85em;
+font-size: 0.8em;
 font-weight: 500;
-transition: all 0.2s;
+width: 100%;
 }
 
 .btn-add {
@@ -225,34 +199,27 @@ color: #1a1a2e;
 .btn-remove {
 background: #fee;
 color: #dc3545;
-}
-
-.btn-icon:active {
-transform: scale(0.95);
+border: 1px solid #fcc;
+margin-top: 5px;
 }
 
 .actions {
 display: flex;
 flex-direction: column;
 gap: 10px;
-margin-top: 30px;
-padding-top: 20px;
+margin-top: 20px;
+padding-top: 15px;
 border-top: 2px solid #e1e4e8;
 }
 
 .btn {
-padding: 16px;
-border-radius: 12px;
+padding: 14px;
+border-radius: 10px;
 font-size: 1em;
 font-weight: 600;
 cursor: pointer;
 border: none;
-transition: all 0.2s;
 width: 100%;
-}
-
-.btn:active {
-transform: scale(0.98);
 }
 
 .btn-secondary {
@@ -263,70 +230,51 @@ color: #495057;
 .btn-primary {
 background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
 color: #1a1a2e;
-box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
 }
 
-/* Tablet ve Desktop */
+.btn-success {
+background: #28a745;
+color: white;
+}
+
+.data-display {
+background: #f8f9fa;
+border: 1px solid #dee2e6;
+border-radius: 8px;
+padding: 15px;
+margin-top: 10px;
+display: none;
+}
+
+.data-display.active {
+display: block;
+}
+
 @media (min-width: 768px) {
-body {
-padding: 20px;
-}
-
-.header {
-padding: 30px;
-}
-
-.logo {
-width: 180px;
-}
-
-.header h1 {
-font-size: 1.8em;
-}
-
-.form-container {
-padding: 30px;
-}
-
-.form-row {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-}
-
-.form-row.two-col {
-grid-template-columns: repeat(2, 1fr);
-}
-
-.checkbox-grid {
-grid-template-columns: repeat(3, 1fr);
-}
-
-.actions {
-flex-direction: row;
-justify-content: flex-end;
-}
-
-.btn {
-width: auto;
-padding: 16px 40px;
-}
-}
-
-@media print {
-body { background: white; padding: 0; }
-.container { box-shadow: none; border-radius: 0; }
-.actions { display: none; }
-.btn-remove, .btn-add { display: none; }
+body { padding: 20px; }
+.form-row { display: grid; grid-template-columns: repeat(3, 1fr); }
+.form-row.two-col { grid-template-columns: repeat(2, 1fr); }
+.checkbox-grid { grid-template-columns: repeat(3, 1fr); }
+.actions { flex-direction: row; }
+.btn { width: auto; padding: 14px 30px; }
 }
 </style>
 </head>
 <body>
 <div class="container">
 <div class="header">
-<!-- Logo PNG olarak eklenecek -->
-<img src="logo.png" alt="EBO Medikal" class="logo" onerror="this.style.display='none'">
-<h1>SERVİS FORMU</h1>
-<p>Teknik Servis Yönetim Sistemi</p>
+<h1>EBO MEDİKAL SERVİS FORMU</h1>
+</div>
+
+<!-- QR Kod Bölümü -->
+<div class="qr-section">
+<div class="qr-container">
+<div id="qrcode"></div>
+<div class="qr-id" id="musteriId">ID: Yükleniyor...</div>
+</div>
+<p style="font-size: 0.8em; color: #666; margin-top: 8px;">
+Bu QR kodu tarayarak müşteri bilgilerine ulaşın
+</p>
 </div>
 
 <div class="form-container">
@@ -335,26 +283,26 @@ body { background: white; padding: 0; }
 <h2 class="section-title">Müşteri Bilgileri</h2>
 <div class="form-row two-col">
 <div class="form-group">
-<label>Firma / Kişi Adı</label>
-<input type="text" id="musteriAdi" placeholder="">
+<label>Firma / Kişi Adı *</label>
+<input type="text" id="musteriAdi" onchange="generateQR()">
 </div>
 <div class="form-group">
 <label>Yetkili Kişi</label>
-<input type="text" id="yetkili" placeholder="">
+<input type="text" id="yetkili">
 </div>
 </div>
 <div class="form-row">
 <div class="form-group">
-<label>Telefon</label>
-<input type="tel" id="telefon" placeholder="">
+<label>Telefon *</label>
+<input type="tel" id="telefon" onchange="generateQR()">
 </div>
 <div class="form-group">
 <label>E-posta</label>
-<input type="email" id="email" placeholder="">
+<input type="email" id="email">
 </div>
 <div class="form-group">
 <label>Adres</label>
-<input type="text" id="adres" placeholder="">
+<input type="text" id="adres">
 </div>
 </div>
 </div>
@@ -368,264 +316,22 @@ body { background: white; padding: 0; }
 <select id="cihazTuru">
 <option value="">Seçiniz...</option>
 <option>MR Cihazı</option>
-<option>CT Tomografi</option>
-<option>Ultrason</option>
+<option>LAZER EPİLASYON</option>
+<option>FRACTİONAL LAZER</option>
 <option>Röntgen</option>
-<option>Mamografi</option>
-<option>Angiografi</option>
-<option>Laboratuvar Cihazı</option>
+<option>KARBON PEELİNG</option>
+<option>CİLT BAKIM CİHAZI</option>
+<option>DÖVME SİLME CİHAZI</option>
 <option>Diğer</option>
 </select>
 </div>
 <div class="form-group">
 <label>Marka / Model</label>
-<input type="text" id="markaModel" placeholder="">
+<input type="text" id="markaModel">
 </div>
 <div class="form-group">
 <label>Seri No</label>
-<input type="text" scale(0.98);
-}
-
-input[type="checkbox"] {
-width: 18px;
-height: 18px;
-accent-color: #ffd700;
-}
-
-.priority-selector {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 10px;
-}
-
-.priority-btn {
-padding: 12px;
-border: 2px solid #e1e4e8;
-background: white;
-border-radius: 10px;
-cursor: pointer;
-transition: all 0.2s;
-font-weight: 500;
-font-size: 0.9em;
-}
-
-.priority-btn.low { color: #28a745; }
-.priority-btn.medium { color: #ff9800; }
-.priority-btn.high { color: #dc3545; }
-
-.priority-btn.active {
-transform: scale(1.05);
-font-weight: 600;
-}
-
-.priority-btn.low.active { background: #d4edda; border-color: #28a745; }
-.priority-btn.medium.active { background: #fff3cd; border-color: #ff9800; }
-.priority-btn.high.active { background: #f8d7da; border-color: #dc3545; }
-
-.parts-card {
-background: white;
-border-radius: 10px;
-border: 1.5px solid #e1e4e8;
-padding: 15px;
-margin-bottom: 10px;
-}
-
-.parts-row {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 10px;
-margin-bottom: 10px;
-}
-
-.parts-row input {
-padding: 10px;
-font-size: 0.9em;
-}
-
-.parts-actions {
-display: flex;
-gap: 8px;
-margin-top: 10px;
-}
-
-.btn-icon {
-flex: 1;
-padding: 10px;
-border: none;
-border-radius: 8px;
-cursor: pointer;
-font-size: 0.85em;
-font-weight: 500;
-transition: all 0.2s;
-}
-
-.btn-add {
-background: #ffd700;
-color: #1a1a2e;
-}
-
-.btn-remove {
-background: #fee;
-color: #dc3545;
-}
-
-.btn-icon:active {
-transform: scale(0.95);
-}
-
-.actions {
-display: flex;
-flex-direction: column;
-gap: 10px;
-margin-top: 30px;
-padding-top: 20px;
-border-top: 2px solid #e1e4e8;
-}
-
-.btn {
-padding: 16px;
-border-radius: 12px;
-font-size: 1em;
-font-weight: 600;
-cursor: pointer;
-border: none;
-transition: all 0.2s;
-width: 100%;
-}
-
-.btn:active {
-transform: scale(0.98);
-}
-
-.btn-secondary {
-background: #e9ecef;
-color: #495057;
-}
-
-.btn-primary {
-background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-color: #1a1a2e;
-box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-}
-
-/* Tablet ve Desktop */
-@media (min-width: 768px) {
-body {
-padding: 20px;
-}
-
-.header {
-padding: 30px;
-}
-
-.logo {
-width: 180px;
-}
-
-.header h1 {
-font-size: 1.8em;
-}
-
-.form-container {
-padding: 30px;
-}
-
-.form-row {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-}
-
-.form-row.two-col {
-grid-template-columns: repeat(2, 1fr);
-}
-
-.checkbox-grid {
-grid-template-columns: repeat(3, 1fr);
-}
-
-.actions {
-flex-direction: row;
-justify-content: flex-end;
-}
-
-.btn {
-width: auto;
-padding: 16px 40px;
-}
-}
-
-@media print {
-body { background: white; padding: 0; }
-.container { box-shadow: none; border-radius: 0; }
-.actions { display: none; }
-.btn-remove, .btn-add { display: none; }
-}
-</style>
-</head>
-<body>
-<div class="container">
-<div class="header">
-<!-- Logo PNG olarak eklenecek -->
-<img src="logo.png" alt="EBO Medikal" class="logo" onerror="this.style.display='none'">
-<h1>SERVİS FORMU</h1>
-<p>Teknik Servis Yönetim Sistemi</p>
-</div>
-
-<div class="form-container">
-<!-- Müşteri Bilgileri -->
-<div class="section">
-<h2 class="section-title">Müşteri Bilgileri</h2>
-<div class="form-row two-col">
-<div class="form-group">
-<label>Firma / Kişi Adı</label>
-<input type="text" id="musteriAdi" placeholder="">
-</div>
-<div class="form-group">
-<label>Yetkili Kişi</label>
-<input type="text" id="yetkili" placeholder="">
-</div>
-</div>
-<div class="form-row">
-<div class="form-group">
-<label>Telefon</label>
-<input type="tel" id="telefon" placeholder="">
-</div>
-<div class="form-group">
-<label>E-posta</label>
-<input type="email" id="email" placeholder="">
-</div>
-<div class="form-group">
-<label>Adres</label>
-<input type="text" id="adres" placeholder="">
-</div>
-</div>
-</div>
-
-<!-- Cihaz Bilgileri -->
-<div class="section">
-<h2 class="section-title">Cihaz Bilgileri</h2>
-<div class="form-row">
-<div class="form-group">
-<label>Cihaz Türü</label>
-<select id="cihazTuru">
-<option value="">Seçiniz...</option>
-<option>MR Cihazı</option>
-<option>CT Tomografi</option>
-<option>Ultrason</option>
-<option>Röntgen</option>
-<option>Mamografi</option>
-<option>Angiografi</option>
-<option>Laboratuvar Cihazı</option>
-<option>Diğer</option>
-</select>
-</div>
-<div class="form-group">
-<label>Marka / Model</label>
-<input type="text" id="markaModel" placeholder="">
-</div>
-<div class="form-group">
-<label>Seri No</label>
-<input type="text" id="seriNo" placeholder="">
+<input type="text" id="seriNo">
 </div>
 </div>
 </div>
@@ -639,27 +345,26 @@ body { background: white; padding: 0; }
 <input type="date" id="bildirimTarihi">
 </div>
 <div class="form-group">
-<label>Başlangıç</label>
-<input type="date" id="baslangicTarihi">
-</div>
-<div class="form-group">
-<label>Tahmini Bitiş</label>
-<input type="date" id="bitisTarihi">
-</div>
-</div>
-
-<div class="form-group" style="margin-top: 15px;">
 <label>Öncelik</label>
 <div class="priority-selector">
-<button type="button" class="priority-btn low" onclick="setPriority(this, 'low')">Düşük</button>
-<button type="button" class="priority-btn medium active" onclick="setPriority(this, 'medium')">Orta</button>
-<button type="button" class="priority-btn high" onclick="setPriority(this, 'high')">Yüksek</button>
+<button type="button" class="priority-btn" onclick="setPriority(this)">Düşük</button>
+<button type="button" class="priority-btn active" onclick="setPriority(this)">Orta</button>
+<button type="button" class="priority-btn" onclick="setPriority(this)">Yüksek</button>
+</div>
+</div>
+<div class="form-group">
+<label>Durum</label>
+<select id="durum">
+<option>Beklemede</option>
+<option>Devam Ediyor</option>
+<option>Tamamlandı</option>
+</select>
 </div>
 </div>
 
-<div class="form-group" style="margin-top: 15px;">
-<label>Bildirilen Arıza</label>
-<textarea id="sikayet" placeholder=""></textarea>
+<div class="form-group" style="margin-top: 10px;">
+<label>Arıza / Şikayet</label>
+<textarea id="sikayet"></textarea>
 </div>
 </div>
 
@@ -675,14 +380,14 @@ body { background: white; padding: 0; }
 <label class="checkbox-item"><input type="checkbox"> Test</label>
 </div>
 
-<div class="form-group" style="margin-top: 15px;">
+<div class="form-group" style="margin-top: 10px;">
 <label>Tespit Edilen Arıza</label>
-<textarea id="tespit" placeholder=""></textarea>
+<textarea id="tespit"></textarea>
 </div>
 
 <div class="form-group" style="margin-top: 10px;">
 <label>Uygulanan Çözüm</label>
-<textarea id="cozum" placeholder=""></textarea>
+<textarea id="cozum"></textarea>
 </div>
 </div>
 
@@ -701,41 +406,7 @@ body { background: white; padding: 0; }
 </div>
 </div>
 </div>
-<button class="btn-icon btn-add" onclick="yeniParca()">+ Parça Ekle</button>
-</div>
-
-<!-- Servis Sonucu -->
-<div class="section">
-<h2 class="section-title">Servis Sonucu</h2>
-<div class="form-row">
-<div class="form-group">
-<label>Durum</label>
-<select id="durum">
-<option value="">Seçiniz...</option>
-<option>Beklemede</option>
-<option>Devam Ediyor</option>
-<option>Parça Bekleniyor</option>
-<option>Tamamlandı</option>
-</select>
-</div>
-<div class="form-group">
-<label>Süre (Saat)</label>
-<input type="number" step="0.5" id="sure" placeholder="">
-</div>
-<div class="form-group">
-<label>Garanti</label>
-<select id="garantiKapsam">
-<option value="">Seçiniz...</option>
-<option>Evet</option>
-<option>Hayır</option>
-</select>
-</div>
-</div>
-
-<div class="form-group" style="margin-top: 15px;">
-<label>Notlar</label>
-<textarea id="notlar" placeholder=""></textarea>
-</div>
+<button type="button" class="btn-icon btn-add" onclick="yeniParca()">+ Parça Ekle</button>
 </div>
 
 <!-- Onay -->
@@ -744,11 +415,11 @@ body { background: white; padding: 0; }
 <div class="form-row">
 <div class="form-group">
 <label>Teknisyen</label>
-<input type="text" id="teknisyen" placeholder="">
+<input type="text" id="teknisyen">
 </div>
 <div class="form-group">
 <label>Onaylayan</label>
-<input type="text" id="onaylayan" placeholder="">
+<input type="text" id="onaylayan">
 </div>
 <div class="form-group">
 <label>Tarih</label>
@@ -758,14 +429,75 @@ body { background: white; padding: 0; }
 </div>
 
 <div class="actions">
-<button class="btn btn-secondary" onclick="formTemizle()">Temizle</button>
-<button class="btn btn-primary" onclick="formYazdir()">Yazdır / Kaydet</button>
+<button type="button" class="btn btn-secondary" onclick="formTemizle()">Yeni Form</button>
+<button type="button" class="btn btn-success" onclick="kaydetVeIndir()">Kaydet & İndir</button>
+<button type="button" class="btn btn-primary" onclick="formYazdir()">Yazdır</button>
+</div>
+
+<!-- Veri Görüntüleme Alanı (QR tarama sonrası) -->
+<div id="dataDisplay" class="data-display">
+<h3>Müşteri Bilgileri</h3>
+<div id="displayContent"></div>
 </div>
 </div>
 </div>
 
 <script>
-function setPriority(btn, level) {
+// Sayfa yüklendiğinde
+window.onload = function() {
+document.getElementById('bildirimTarihi').valueAsDate = new Date();
+generateQR();
+};
+
+// Benzersiz ID oluştur
+function generateId() {
+const musteri = document.getElementById('musteriAdi').value || 'MUSTERI';
+const tel = document.getElementById('telefon').value || '0000';
+const tarih = new Date().toISOString().slice(0,10).replace(/-/g,'');
+const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+return `EBO-${musteri.substring(0,3).toUpperCase()}-${tel.slice(-4)}-${tarih}-${random}`;
+}
+
+// QR Kod oluştur
+function generateQR() {
+const id = generateId();
+document.getElementById('musteriId').textContent = `ID: ${id}`;
+
+// QR kodu temizle ve yeniden oluştur
+const qrContainer = document.getElementById('qrcode');
+qrContainer.innerHTML = '';
+
+// Form verilerini JSON olarak hazırla
+const formData = {
+id: id,
+musteri: document.getElementById('musteriAdi').value,
+telefon: document.getElementById('telefon').value,
+email: document.getElementById('email').value,
+adres: document.getElementById('adres').value,
+cihaz: document.getElementById('cihazTuru').value,
+marka: document.getElementById('markaModel').value,
+seriNo: document.getElementById('seriNo').value,
+tarih: document.getElementById('bildirimTarihi').value,
+sikayet: document.getElementById('sikayet').value,
+tespit: document.getElementById('tespit').value,
+cozum: document.getElementById('cozum').value,
+durum: document.getElementById('durum').value
+};
+
+// QR kodu oluştur (base64 veri)
+const qrData = btoa(JSON.stringify(formData));
+
+new QRCode(qrContainer, {
+text: qrData,
+width: 128,
+height: 128,
+colorDark : "#1a1a2e",
+colorLight : "#ffffff",
+correctLevel : QRCode.CorrectLevel.M
+});
+}
+
+function setPriority(btn) {
 document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('active'));
 btn.classList.add('active');
 }
@@ -774,34 +506,69 @@ function yeniParca() {
 const container = document.getElementById('parcaListesi');
 const card = document.createElement('div');
 card.className = 'parts-card';
-card.innerHTML = `
-<div class="parts-row">
-<input type="text" placeholder="Parça Kodu">
-<input type="text" placeholder="Parça Adı">
-</div>
-<div class="parts-row">
-<input type="number" placeholder="Miktar">
-<input type="text" placeholder="Birim Fiyat">
-</div>
-<button class="btn-icon btn-remove" onclick="this.parentElement.remove()">Sil</button>
-`;
+card.innerHTML =
+'<div class="parts-row">' +
+'<input type="text" placeholder="Parça Kodu">' +
+'<input type="text" placeholder="Parça Adı">' +
+'</div>' +
+'<div class="parts-row">' +
+'<input type="number" placeholder="Miktar">' +
+'<input type="text" placeholder="Birim Fiyat">' +
+'</div>' +
+'<button type="button" class="btn-icon btn-remove" onclick="this.parentElement.remove()">Sil</button>';
 container.appendChild(card);
 }
 
 function formTemizle() {
-if(confirm('Tüm alanlar temizlenecek?')) {
+if(confirm('Yeni form başlatılacak. Emin misiniz?')) {
 document.querySelectorAll('input, textarea').forEach(el => el.value = '');
 document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
 document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+document.getElementById('bildirimTarihi').valueAsDate = new Date();
+generateQR();
 }
+}
+
+function kaydetVeIndir() {
+generateQR();
+const formData = {
+id: document.getElementById('musteriId').textContent,
+musteri: document.getElementById('musteriAdi').value,
+tarih: new Date().toLocaleString('tr-TR')
+};
+
+// LocalStorage'a kaydet
+let kayitlar = JSON.parse(localStorage.getItem('eboServis') || '[]');
+kayitlar.push(formData);
+localStorage.setItem('eboServis', JSON.stringify(kayitlar));
+
+alert('Form kaydedildi! ID: ' + formData.id);
 }
 
 function formYazdir() {
 window.print();
 }
 
-// Bugünün tarihi
-document.getElementById('bildirimTarihi').valueAsDate = new Date();
+// QR kod okuma simülasyonu (gerçek uygulamada kamera ile okunur)
+function readQR(qrData) {
+try {
+const data = JSON.parse(atob(qrData));
+const display = document.getElementById('dataDisplay');
+const content = document.getElementById('displayContent');
+
+content.innerHTML = `
+<p><strong>ID:</strong> ${data.id}</p>
+<p><strong>Müşteri:</strong> ${data.musteri}</p>
+<p><strong>Telefon:</strong> ${data.telefon}</p>
+<p><strong>Cihaz:</strong> ${data.cihaz} - ${data.marka}</p>
+<p><strong>Seri No:</strong> ${data.seriNo}</p>
+<p><strong>Durum:</strong> ${data.durum}</p>
+`;
+display.classList.add('active');
+} catch(e) {
+alert('Geçersiz QR kod!');
+}
+}
 </script>
 </body>
 </html>
