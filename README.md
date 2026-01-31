@@ -316,12 +316,12 @@ Bu QR kodu tarayarak müşteri bilgilerine ulaşın
 <select id="cihazTuru">
 <option value="">Seçiniz...</option>
 <option>MR Cihazı</option>
-<option>LAZER EPİLASYON</option>
-<option>FRACTİONAL LAZER</option>
+<option>CT Tomografi</option>
+<option>Ultrason</option>
 <option>Röntgen</option>
-<option>KARBON PEELİNG</option>
-<option>CİLT BAKIM CİHAZI</option>
-<option>DÖVME SİLME CİHAZI</option>
+<option>Mamografi</option>
+<option>Angiografi</option>
+<option>Laboratuvar Cihazı</option>
 <option>Diğer</option>
 </select>
 </div>
