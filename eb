@@ -1,0 +1,477 @@
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servis Formu - EBO</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: #f5f6fa; padding: 20px;
+}
+.form-container {
+max-width: 1200px; margin: 0 auto; background: white;
+padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.form-header {
+text-align: center; margin-bottom: 30px;
+padding-bottom: 20px; border-bottom: 3px solid #2c3e50;
+}
+.form-header h1 { color: #2c3e50; font-size: 24px; margin-bottom: 5px; }
+.form-header p { color: #7f8c8d; font-size: 14px; }
+.form-meta {
+display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 15px; margin-bottom: 30px; background: #ecf0f1;
+padding: 15px; border-radius: 5px;
+}
+.meta-item { display: flex; justify-content: space-between; align-items: center; }
+.meta-item label { font-weight: 600; color: #555; }
+.meta-item input { width: 60%; padding: 5px 10px; border: 1px solid #bdc3c7; border-radius: 3px; }
+.section {
+margin-bottom: 25px; border: 1px solid #ddd;
+border-radius: 5px; overflow: hidden;
+}
+.section-title {
+background: #34495e; color: white; padding: 10px 15px;
+font-weight: 600; font-size: 14px;
+}
+.section-content {
+padding: 20px; display: grid;
+grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;
+}
+.form-group { display: flex; flex-direction: column; }
+.form-group.full-width { grid-column: 1 / -1; }
+.form-group label {
+font-size: 12px; font-weight: 600; color: #555;
+margin-bottom: 5px; text-transform: uppercase;
+}
+.form-group input, .form-group select, .form-group textarea {
+padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+outline: none; border-color: #3498db;
+}
+.form-group textarea { min-height: 80px; resize: vertical; }
+.items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+.items-table th, .items-table td {
+border: 1px solid #ddd; padding: 10px; text-align: left;
+}
+.items-table th { background: #ecf0f1; font-weight: 600; font-size: 12px; }
+.items-table input { width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 3px; }
+.items-table td:last-child { text-align: right; }
+.summary {
+background: #f8f9fa; padding: 15px; border-radius: 5px;
+margin-top: 20px;
+}
+.summary-row {
+display: flex; justify-content: space-between;
+margin-bottom: 10px; padding: 5px 0;
+}
+.summary-row.total {
+border-top: 2px solid #2c3e50; padding-top: 10px;
+font-weight: bold; font-size: 18px; color: #2c3e50;
+}
+.actions {
+display: flex; gap: 10px; justify-content: center;
+margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;
+}
+.btn {
+padding: 12px 30px; border: none; border-radius: 5px;
+font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+}
+.btn-primary { background: #3498db; color: white; }
+.btn-success { background: #27ae60; color: white; }
+.btn-secondary { background: #95a5a6; color: white; }
+.btn:hover { opacity: 0.9; transform: translateY(-2px); }
+.footer-info {
+margin-top: 30px; padding-top: 20px;
+border-top: 2px solid #2c3e50; text-align: center;
+color: #555; font-size: 14px; line-height: 1.6;
+}
+@media print {
+body { background: white; padding: 0; }
+.form-container { box-shadow: none; max-width: 100%; }
+.no-print { display: none !important; }
+.section { page-break-inside: avoid; }
+}
+@media (max-width: 768px) {
+.section-content { grid-template-columns: 1fr; }
+.actions { flex-direction: column; }
+.btn { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="form-container">
+<div class="form-header">
+<h1>TEKLİF FORMU</h1>
+<p>ENDÜSTRİYEL BAKIM ONARIM SERVİSİ</p>
+</div>
+
+<div class="form-meta">
+<div class="meta-item">
+<label>Form No:</label>
+<input type="text" id="formNo" readonly>
+</div>
+<div class="meta-item">
+<label>Müşteri No:</label>
+<input type="text" id="customerNo">
+</div>
+<div class="meta-item">
+<label>Tarih:</label>
+<input type="datetime-local" id="formDate">
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Cihaz Bilgileri</div>
+<div class="section-content">
+<div class="form-group">
+<label>Seri No</label>
+<input type="text" id="deviceSerial" placeholder="Seri numarası girin">
+</div>
+<div class="form-group">
+<label>Marka</label>
+<input type="text" id="deviceBrand" placeholder="Marka girin">
+</div>
+<div class="form-group">
+<label>Model</label>
+<input type="text" id="deviceModel" placeholder="Model girin">
+</div>
+<div class="form-group">
+<label>Model No</label>
+<input type="text" id="deviceModelNo" placeholder="Model numarası">
+</div>
+<div class="form-group">
+<label>Ürün Tipi</label>
+<input type="text" id="deviceType" placeholder="Ürün tipi">
+</div>
+<div class="form-group">
+<label>Geliş Tarihi</label>
+<input type="datetime-local" id="arrivalDate">
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Müşteri Bilgileri</div>
+<div class="section-content">
+<div class="form-group">
+<label>Müşteri Adı</label>
+<input type="text" id="customerName" placeholder="Müşteri adı soyadı">
+</div>
+<div class="form-group">
+<label>Firma Adı</label>
+<input type="text" id="companyName" placeholder="Firma adı">
+</div>
+<div class="form-group">
+<label>Tel / Dahili</label>
+<input type="text" id="customerPhone" placeholder="Telefon numarası">
+</div>
+<div class="form-group">
+<label>GSM</label>
+<input type="text" id="customerGsm" placeholder="GSM numarası">
+</div>
+<div class="form-group">
+<label>Faks</label>
+<input type="text" id="customerFax" placeholder="Faks numarası">
+</div>
+<div class="form-group">
+<label>E-Posta</label>
+<input type="email" id="customerEmail" placeholder="E-posta adresi">
+</div>
+<div class="form-group full-width">
+<label>Adres</label>
+<textarea id="customerAddress" placeholder="Müşteri adresi"></textarea>
+</div>
+<div class="form-group full-width">
+<label>Fatura Adresi</label>
+<textarea id="billingAddress" placeholder="Fatura adresi"></textarea>
+</div>
+<div class="form-group">
+<label>Vergi Dairesi</label>
+<input type="text" id="taxOffice" placeholder="Vergi dairesi">
+</div>
+<div class="form-group">
+<label>Vergi No</label>
+<input type="text" id="taxNo" placeholder="Vergi numarası">
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Arıza Bilgileri</div>
+<div class="section-content">
+<div class="form-group full-width">
+<label>Bildirilen Arıza</label>
+<textarea id="reportedFault" placeholder="Müşterinin bildirdiği arıza"></textarea>
+</div>
+<div class="form-group full-width">
+<label>Aksesuar</label>
+<textarea id="accessories" placeholder="Gelen aksesuarlar"></textarea>
+</div>
+<div class="form-group full-width">
+<label>Bulunan Arıza</label>
+<textarea id="foundFault" placeholder="Teknisyenin tespit ettiği arıza"></textarea>
+</div>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">İşlem ve Malzeme Listesi</div>
+<div class="section-content" style="display: block;">
+<table class="items-table">
+<thead>
+<tr>
+<th style="width: 50%;">AÇIKLAMA</th>
+<th style="width: 10%;">MİKTAR</th>
+<th style="width: 20%;">BİRİM FİYAT</th>
+<th style="width: 20%;">TUTAR</th>
+</tr>
+</thead>
+<tbody id="itemsTableBody"></tbody>
+</table>
+<button type="button" class="btn btn-secondary no-print" onclick="addItem()" style="margin-top: 10px; padding: 8px 16px; font-size: 14px;">+ Satır Ekle</button>
+</div>
+</div>
+
+<div class="summary">
+<div class="summary-row">
+<span>TUTAR:</span>
+<span id="subtotal">0,00 TL</span>
+</div>
+<div class="summary-row">
+<span>KDV %18:</span>
+<span id="tax">0,00 TL</span>
+</div>
+<div class="summary-row total">
+<span>TOPLAM:</span>
+<span id="total">0,00 TL</span>
+</div>
+</div>
+
+<div class="section">
+<div class="section-title">Durum ve Tarihçe</div>
+<div class="section-content">
+<div class="form-group">
+<label>Servis Durumu</label>
+<select id="serviceStatus">
+<option value="Bekliyor">Bekliyor</option>
+<option value="İşlemde">İşlemde</option>
+<option value="Tamamlandı">Tamamlandı</option>
+<option value="Teslim Edildi">Teslim Edildi</option>
+</select>
+</div>
+<div class="form-group">
+<label>Teslim Eden</label>
+<input type="text" id="deliveredBy" placeholder="Teslim eden personel">
+</div>
+<div class="form-group">
+<label>Teslim Alan</label>
+<input type="text" id="receivedBy" placeholder="Teslim alan müşteri">
+</div>
+</div>
+</div>
+
+<div class="footer-info">
+<strong>ELEKTRONİK BAKIM ONARIM SERVİSİ</strong><br>
+ÇIRÇIR MH. GÖNGÜREN CD NO/80 D/1 EYÜP/ALİBEYKÖY/İST<br>
+05325253010 / 05346596716 | info@eboservis.com<br>
+www.eboservis.com
+</div>
+
+<div class="actions no-print">
+<button type="button" class="btn btn-secondary" onclick="window.location.href='admin.html'">İptal</button>
+<button type="button" class="btn btn-primary" onclick="saveForm(false)">Kaydet</button>
+<button type="button" class="btn btn-success" onclick="saveForm(true)">Kaydet ve Yazdır</button>
+</div>
+</div>
+
+<script src="js/firebase-config.js"></script>
+<script>
+let currentFormId = null;
+
+auth.onAuthStateChanged(user => {
+if (!user) window.location.href = 'index.html';
+else initForm();
+});
+
+function initForm() {
+const urlParams = new URLSearchParams(window.location.search);
+currentFormId = urlParams.get('id');
+
+if (!currentFormId) {
+generateFormNo();
+addItem();
+} else {
+loadForm(currentFormId);
+}
+
+const now = new Date();
+const dateStr = now.toISOString().slice(0, 16);
+document.getElementById('formDate').value = dateStr;
+document.getElementById('arrivalDate').value = dateStr;
+}
+
+function generateFormNo() {
+const now = new Date();
+const year = now.getFullYear().toString().slice(-2);
+const month = String(now.getMonth() + 1).padStart(2, '0');
+const day = String(now.getDate()).padStart(2, '0');
+const random = Math.floor(1000 + Math.random() * 9000);
+document.getElementById('formNo').value = `${year}${month}${day}-${random}`;
+}
+
+function addItem(desc = '', qty = 1, price = 0) {
+const tbody = document.getElementById('itemsTableBody');
+const row = document.createElement('tr');
+row.innerHTML = `
+<td><input type="text" class="item-desc" value="${desc}" placeholder="İşlem/Malzeme açıklaması"></td>
+<td><input type="number" class="item-qty" value="${qty}" min="0" onchange="calculateTotals()"></td>
+<td><input type="number" class="item-price" value="${price}" min="0" step="0.01" onchange="calculateTotals()"></td>
+<td class="item-total">0,00 TL</td>
+`;
+tbody.appendChild(row);
+calculateTotals();
+}
+
+function calculateTotals() {
+let subtotal = 0;
+document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+const price = parseFloat(row.querySelector('.item-price').value) || 0;
+const total = qty * price;
+row.querySelector('.item-total').textContent = total.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' TL';
+subtotal += total;
+});
+
+const tax = subtotal * 0.18;
+const total = subtotal + tax;
+
+document.getElementById('subtotal').textContent = subtotal.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' TL';
+document.getElementById('tax').textContent = tax.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' TL';
+document.getElementById('total').textContent = total.toLocaleString('tr-TR', {minimumFractionDigits: 2}) + ' TL';
+}
+
+function loadForm(id) {
+database.ref('forms/' + id).once('value').then(snapshot => {
+const form = snapshot.val();
+if (!form) return;
+
+document.getElementById('formNo').value = form.formNo || '';
+document.getElementById('customerNo').value = form.customerNo || '';
+document.getElementById('formDate').value = form.formDate || '';
+
+document.getElementById('deviceSerial').value = form.device?.serialNo || '';
+document.getElementById('deviceBrand').value = form.device?.brand || '';
+document.getElementById('deviceModel').value = form.device?.model || '';
+document.getElementById('deviceModelNo').value = form.device?.modelNo || '';
+document.getElementById('deviceType').value = form.device?.type || '';
+document.getElementById('arrivalDate').value = form.device?.arrivalDate || '';
+
+document.getElementById('customerName').value = form.customer?.name || '';
+document.getElementById('companyName').value = form.customer?.company || '';
+document.getElementById('customerPhone').value = form.customer?.phone || '';
+document.getElementById('customerGsm').value = form.customer?.gsm || '';
+document.getElementById('customerFax').value = form.customer?.fax || '';
+document.getElementById('customerEmail').value = form.customer?.email || '';
+document.getElementById('customerAddress').value = form.customer?.address || '';
+document.getElementById('billingAddress').value = form.customer?.billingAddress || '';
+document.getElementById('taxOffice').value = form.customer?.taxOffice || '';
+document.getElementById('taxNo').value = form.customer?.taxNo || '';
+
+document.getElementById('reportedFault').value = form.fault?.reported || '';
+document.getElementById('accessories').value = form.fault?.accessories || '';
+document.getElementById('foundFault').value = form.fault?.found || '';
+
+const tbody = document.getElementById('itemsTableBody');
+tbody.innerHTML = '';
+if (form.items && form.items.length > 0) {
+form.items.forEach(item => addItem(item.description, item.quantity, item.price));
+} else {
+addItem();
+}
+
+document.getElementById('serviceStatus').value = form.status || 'Bekliyor';
+document.getElementById('deliveredBy').value = form.delivery?.deliveredBy || '';
+document.getElementById('receivedBy').value = form.delivery?.receivedBy || '';
+});
+}
+
+function saveForm(printAfterSave) {
+const user = auth.currentUser;
+if (!user) { alert('Oturum süreniz dolmuş!'); return; }
+
+const formData = {
+formNo: document.getElementById('formNo').value,
+customerNo: document.getElementById('customerNo').value,
+formDate: document.getElementById('formDate').value,
+device: {
+serialNo: document.getElementById('deviceSerial').value,
+brand: document.getElementById('deviceBrand').value,
+model: document.getElementById('deviceModel').value,
+modelNo: document.getElementById('deviceModelNo').value,
+type: document.getElementById('deviceType').value,
+arrivalDate: document.getElementById('arrivalDate').value
+},
+customer: {
+name: document.getElementById('customerName').value,
+company: document.getElementById('companyName').value,
+phone: document.getElementById('customerPhone').value,
+gsm: document.getElementById('customerGsm').value,
+fax: document.getElementById('customerFax').value,
+email: document.getElementById('customerEmail').value,
+address: document.getElementById('customerAddress').value,
+billingAddress: document.getElementById('billingAddress').value,
+taxOffice: document.getElementById('taxOffice').value,
+taxNo: document.getElementById('taxNo').value
+},
+fault: {
+reported: document.getElementById('reportedFault').value,
+accessories: document.getElementById('accessories').value,
+found: document.getElementById('foundFault').value
+},
+items: [], subtotal: 0, tax: 0, total: 0,
+status: document.getElementById('serviceStatus').value,
+delivery: {
+deliveredBy: document.getElementById('deliveredBy').value,
+receivedBy: document.getElementById('receivedBy').value
+},
+updatedAt: firebase.database.ServerValue.TIMESTAMP,
+updatedBy: user.email
+};
+
+document.querySelectorAll('#itemsTableBody tr').forEach(row => {
+const desc = row.querySelector('.item-desc').value;
+const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+const price = parseFloat(row.querySelector('.item-price').value) || 0;
+if (desc || qty > 0 || price > 0) {
+formData.items.push({description: desc, quantity: qty, price: price, total: qty * price});
+}
+});
+
+formData.subtotal = formData.items.reduce((sum, item) => sum + item.total, 0);
+formData.tax = formData.subtotal * 0.18;
+formData.total = formData.subtotal + formData.tax;
+
+let savePromise;
+if (currentFormId) {
+savePromise = database.ref('forms/' + currentFormId).update(formData);
+} else {
+formData.createdAt = firebase.database.ServerValue.TIMESTAMP;
+formData.createdBy = user.email;
+savePromise = database.ref('forms').push(formData);
+}
+
+savePromise.then(() => {
+if (printAfterSave) window.print();
+alert('Form başarıyla kaydedildi!');
+window.location.href = 'admin.html';
+}).catch(error => alert('Hata: ' + error.message));
+}
+</script>
+</body>
+</html>
